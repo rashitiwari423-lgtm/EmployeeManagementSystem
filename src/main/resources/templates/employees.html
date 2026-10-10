@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees | EmployEase</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <a href="#" class="brand">
+            <span class="brand-mark">E</span>
+            <span>Employ<span class="brand-accent">Ease</span></span>
+        </a>
+
+        <p class="nav-heading">WORKSPACE</p>
+
+        <a th:href="@{/employees}" class="nav-item active">
+            <span class="nav-icon">▦</span>
+            Employees
+        </a>
+
+        <div class="sidebar-bottom">
+            <div class="profile-avatar">HR</div>
+            <div>
+                <strong>HR Manager</strong>
+                <small>Administrator</small>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="page-header">
+            <div>
+                <p class="breadcrumb">WORKSPACE / EMPLOYEES</p>
+                <h1>People directory<span class="title-dot">.</span></h1>
+                <p class="subtitle">
+                    Everything about your team, all in one place.
+                </p>
+            </div>
+
+            <a th:href="@{/add-employee}" class="btn btn-primary">
+                <span class="plus">+</span> Add employee
+            </a>
+        </header>
+
+        <section class="welcome-panel">
+            <div>
+                <span class="panel-label">YOUR TEAM, SIMPLIFIED</span>
+                <h2>Great work starts with great people.</h2>
+                <p>Organize employee records and keep your team moving forward.</p>
+            </div>
+            <div class="panel-number">01 <span>/ DIRECTORY</span></div>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-symbol">↗</span>
+                    Total employees
+                </div>
+                <h2 th:text="${#lists.size(employees)}">0</h2>
+                <p>People in your organization</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-symbol">▤</span>
+                    Departments
+                </div>
+                <h2 id="departmentCount">0</h2>
+                <p>Distinct teams represented</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-label">
+                    <span class="stat-symbol">₹</span>
+                    Total monthly salary
+                </div>
+                <h2 id="salaryTotal">₹0</h2>
+                <p>Combined listed salaries</p>
+            </article>
+        </section>
+
+        <section class="directory-card">
+
+            <div class="directory-header">
+                <div>
+                    <p class="section-kicker">THE DIRECTORY</p>
+                    <h2>All employees</h2>
+                    <p class="section-description">
+                        Browse and manage your employee information.
+                    </p>
+                </div>
+
+                <span class="record-count">
+                    <span id="recordCount"
+                          th:text="${#lists.size(employees)}">0</span>
+                    records
+                </span>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-field">
+                    <label for="searchInput">Search</label>
+                    <div class="input-wrap">
+                        <span aria-hidden="true">⌕</span>
+                        <input type="search"
+                               id="searchInput"
+                               placeholder="Name or email..."
+                               autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="filter-field">
+                    <label for="departmentFilter">Department</label>
+                    <select id="departmentFilter">
+                        <option value="">All departments</option>
+                    </select>
+                </div>
+
+                <button type="button" id="clearFilters" class="btn btn-outline">
+                    Clear filters
+                </button>
+            </div>
+
+            <div class="table-scroll">
+                <table class="employee-table">
+                    <thead>
+                    <tr>
+                        <th>EMPLOYEE</th>
+                        <th>EMAIL ADDRESS</th>
+                        <th>DEPARTMENT</th>
+                        <th>SALARY</th>
+                        <th class="actions-heading">ACTIONS</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="employeeTableBody">
+                    <tr class="employee-row"
+                        th:each="employee : ${employees}">
+
+                        <td>
+                            <div class="employee-cell">
+                                <div class="employee-avatar"
+                                     th:text="${employee.name != null and !#strings.isEmpty(employee.name) ? #strings.substring(employee.name, 0, 1).toUpperCase() : 'E'}">
+                                    E
+                                </div>
+                                <div class="employee-details">
+                                    <strong th:text="${employee.name}">Employee name</strong>
+                                    <small>
+                                        ID #<span th:text="${employee.id}">1</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="email-cell" th:text="${employee.email}">
+                            employee@example.com
+                        </td>
+
+                        <td>
+                            <span class="department-tag"
+                                  th:text="${employee.department}">
+                                Department
+                            </span>
+                        </td>
+
+                        <td class="salary-cell">
+                            ₹<span class="salary-value"
+                                   th:text="${#numbers.formatDecimal(employee.salary, 1, 'COMMA', 0, 'POINT')}">0</span>
+                        </td>
+
+                        <td>
+                            <div class="action-buttons">
+                                <a class="action-link edit-link"
+                                   th:href="@{/edit-employee(id=${employee.id})}">
+                                    Edit
+                                </a>
+
+                                <a class="action-link delete-link"
+                                   th:href="@{/delete-employee(id=${employee.id})}"
+                                   onclick="return confirm('Are you sure you want to delete this employee?');">
+                                    Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(employees)}">
+                        <td colspan="5" class="empty-cell">
+                            <div class="empty-state">
+                                <div class="empty-mark">E</div>
+                                <h3>Your directory starts here.</h3>
+                                <p>Add your first employee to get started.</p>
+                                <a th:href="@{/add-employee}"
+                                   class="btn btn-primary">
+                                    + Add first employee
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noResults" class="no-results" hidden>
+                No matching employees found. Try another search.
+            </div>
+
+            <div class="table-footer">
+                <span>Showing <strong id="visibleCount">0</strong> employees</span>
+                <span>EmployEase <span class="footer-dot">●</span> People first.</span>
+            </div>
+
+        </section>
+
+        <footer class="page-footer">
+            Made for teams that care about their people.
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rows = [...document.querySelectorAll(".employee-row")];
+        const searchInput = document.getElementById("searchInput");
+        const departmentFilter = document.getElementById("departmentFilter");
+        const clearButton = document.getElementById("clearFilters");
+
+        const departmentCount = document.getElementById("departmentCount");
+        const salaryTotal = document.getElementById("salaryTotal");
+        const recordCount = document.getElementById("recordCount");
+        const visibleCount = document.getElementById("visibleCount");
+        const noResults = document.getElementById("noResults");
+
+        const departments = new Set();
+        let totalSalary = 0;
+
+        rows.forEach(function (row) {
+            const department = row.cells[2].innerText.trim();
+            if (department) departments.add(department);
+
+            const salary = row.querySelector(".salary-value");
+            if (salary) {
+                totalSalary += Number(salary.innerText.replace(/,/g, "")) || 0;
+            }
+        });
+
+        [...departments].sort().forEach(function (department) {
+            const option = document.createElement("option");
+            option.value = department.toLowerCase();
+            option.textContent = department;
+            departmentFilter.appendChild(option);
+        });
+
+        departmentCount.textContent = departments.size;
+        salaryTotal.textContent = totalSalary.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0
+        });
+
+        function filterEmployees() {
+            const query = searchInput.value.trim().toLowerCase();
+            const department = departmentFilter.value;
+            let visible = 0;
+
+            rows.forEach(function (row) {
+                const name = row.cells[0].innerText.toLowerCase();
+                const email = row.cells[1].innerText.toLowerCase();
+                const rowDepartment = row.cells[2].innerText.trim().toLowerCase();
+
+                const matchesSearch =
+                    name.includes(query) || email.includes(query);
+                const matchesDepartment =
+                    !department || rowDepartment === department;
+
+                const show = matchesSearch && matchesDepartment;
+                row.hidden = !show;
+
+                if (show) visible++;
+            });
+
+            visibleCount.textContent = visible;
+            recordCount.textContent = visible;
+            noResults.hidden = visible !== 0 || rows.length === 0;
+        }
+
+        searchInput.addEventListener("input", filterEmployees);
+        departmentFilter.addEventListener("change", filterEmployees);
+
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            departmentFilter.value = "";
+            filterEmployees();
+        });
+
+        filterEmployees();
+    });
+</script>
+
+</body>
+</html>
